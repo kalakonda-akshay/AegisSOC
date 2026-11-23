@@ -1,15 +1,12 @@
 # =============================================================================
 # AegisSOC Render Blueprint Configuration (100% Free Tier)
 # =============================================================================
-# Connect this repository to https://render.com via "New Blueprint Instance"
-# to automatically deploy the complete AegisSOC platform with zero manual steps.
-
 services:
   - type: web
     name: aegissoc
     runtime: docker
-    dockerfilePath: backend/Dockerfile
-    dockerContext: .
+    dockerContext: backend
+    dockerfilePath: Dockerfile
     plan: free
     region: oregon
     healthCheckPath: /health

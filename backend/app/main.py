@@ -69,7 +69,21 @@ from app.websocket.routes import router as ws_router
 app.include_router(ws_router)
 
 
-frontend_html_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "aegissoc.html"))
+def get_frontend_path():
+    candidates = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "aegissoc.html")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "aegissoc.html")),
+        os.path.abspath(os.path.join(os.getcwd(), "frontend", "aegissoc.html")),
+        os.path.abspath(os.path.join(os.getcwd(), "..", "frontend", "aegissoc.html")),
+        "/app/frontend/aegissoc.html",
+        "/app/backend/frontend/aegissoc.html",
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return p
+    return candidates[0]
+
+frontend_html_path = get_frontend_path()
 
 
 @app.get("/", tags=["Root"])

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AegisSOC – Autonomous AI Cybersecurity Operations</title>
+<style>
+:root{--bg:#080B12;--bg2:#0D121C;--side:#0A0F18;--card:#111925;--bd:#202C3A;--ac:#39E6A3;--ac2:#37BDF8;--crit:#FF4D5E;--warn:#FFB547;--tx:#E8EEF6;--tx2:#8795A8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#080B12}}
+:root[data-theme="dark"]{--bg:#080B12}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 Inter,Geist,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;overflow-x:hidden}
+.app{display:flex;min-height:100vh}
+aside{width:224px;background:var(--side);border-right:1px solid var(--bd);padding:16px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;font-weight:600;font-size:16px;letter-spacing:.2px}
+.logo i{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;color:#06210f;font-style:normal;font-weight:800;font-size:13px}
+nav button{all:unset;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--tx2);cursor:pointer;width:100%;box-sizing:border-box;transition:.15s}
+nav button:hover{background:var(--card);color:var(--tx)}
+nav button.on{background:var(--card);color:var(--tx);box-shadow:inset 2px 0 0 var(--ac)}
+nav svg{width:16px;height:16px;flex-shrink:0}
+.side-foot{margin-top:auto;font-size:12px;color:var(--tx2);padding:8px}
+main{flex:1;min-width:0;padding:20px 24px 40px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.top .crumb{color:var(--tx2);font-size:13px}.top .sp{flex:1}
+input,select,textarea{background:var(--bg2);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:8px 10px;font:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ac2)}
+.btn{background:var(--card);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;transition:.15s}
+.btn:hover{border-color:var(--ac2)}.btn.pri{background:var(--ac);color:#06210f;border-color:var(--ac);font-weight:600}
+.banner{background:rgba(55,189,248,.08);border:1px solid rgba(55,189,248,.3);color:#9bdcf9;border-radius:8px;padding:8px 12px;font-size:12.5px;margin-bottom:16px}
+h1{font-size:22px;margin:0 0 2px;font-weight:600}.sub{color:var(--tx2);margin-bottom:16px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ac)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ac);display:inline-block}
+.dot.warn{background:var(--warn)}.dot.crit{background:var(--crit)}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:14px}
+.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;transition:.2s;min-width:0}
+.kpi:hover{transform:translateY(-2px);border-color:#2c3c50}
+.kpi .l{color:var(--tx2);font-size:12px}.kpi .v{font-size:26px;font-weight:600;margin:2px 0}
+.kpi .t{font-size:12px}.up{color:var(--crit)}.dn{color:var(--ac)}
+.card h3{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.6px}
+svg.ch{width:100%;height:auto;display:block}
+.sev{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid}
+.s-Critical{color:var(--crit);border-color:rgba(255,77,94,.4);background:rgba(255,77,94,.1)}
+.s-High{color:var(--warn);border-color:rgba(255,181,71,.4);background:rgba(255,181,71,.1)}
+.s-Medium{color:var(--ac2);border-color:rgba(55,189,248,.4);background:rgba(55,189,248,.1)}
+.s-Low{color:var(--ac);border-color:rgba(57,230,163,.4);background:rgba(57,230,163,.1)}
+.feed{max-height:300px;overflow:auto}
+.ev{display:grid;grid-template-columns:62px 1fr auto;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);font-size:12.5px;animation:in .4s}
+@keyframes in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;color:var(--tx2)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:640px}
+th{text-align:left;color:var(--tx2);font-weight:500;font-size:12px;padding:8px;border-bottom:1px solid var(--bd);cursor:pointer;user-select:none;white-space:nowrap}
+td{padding:9px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}
+tr.r:hover td{background:rgba(255,255,255,.025);cursor:pointer}
+.bar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.health{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd)}
+.flow{display:flex;gap:6px;margin:10px 0 14px;flex-wrap:wrap}
+.flow button{flex:1;min-width:90px;background:var(--bg2);border:1px solid var(--bd);color:var(--tx2);border-radius:8px;padding:8px;cursor:pointer;font:inherit}
+.flow button.on{border-color:var(--ac);color:var(--ac);background:rgba(57,230,163,.08)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.show{display:flex}.modal .card{max-width:620px;width:100%;max-height:90vh;overflow:auto;animation:in .25s}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:4px 10px;font-size:13px;margin:10px 0}.kv span:nth-child(odd){color:var(--tx2)}
+.chat{display:flex;flex-direction:column;height:calc(100vh - 230px);min-height:420px}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;padding-bottom:10px}
+.m{max-width:760px;padding:10px 14px;border-radius:10px;border:1px solid var(--bd);white-space:pre-wrap}
+.m.u{align-self:flex-end;background:var(--bg2)}.m.a{background:var(--card)}
+.m .tag{font-size:11px;color:var(--ac2);margin-bottom:4px;display:block}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{background:var(--bg2);border:1px solid var(--bd);color:var(--tx);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit;font-size:12.5px}
+.chip:hover{border-color:var(--ac)}
+.inp{display:flex;gap:8px}.inp textarea{flex:1;resize:none;height:44px}
+.toast{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--card);border:1px solid var(--ac);border-radius:8px;padding:10px 14px;z-index:60;animation:in .25s}
+.menu{display:none}
+@media(max-width:780px){aside{position:fixed;left:-240px;z-index:40;transition:.25s}aside.open{left:0}main{padding:14px}.menu{display:inline-block}.kv{grid-template-columns:100px 1fr}}
+.card{box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 8px 24px -16px rgba(0,0,0,.6)}
+.kpi{position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--k,var(--bd));opacity:.7}
+.kpi:hover{box-shadow:0 10px 28px -14px var(--k,#000)}
+.kpi .v{font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+:focus-visible{outline:2px solid var(--ac2);outline-offset:2px}
+.btn:active{transform:scale(.97)}
+.ev:hover{background:rgba(255,255,255,.02)}
+.leg{display:flex;gap:14px;font-size:12px;color:var(--tx2);margin-top:8px}.leg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.ws{display:grid;grid-template-columns:200px minmax(0,1fr) 260px;gap:14px}
+.ws .kv{grid-template-columns:84px 1fr}
+.hi{padding:7px 8px;border-radius:7px;color:var(--tx2);cursor:pointer;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hi:hover{background:var(--bg2);color:var(--tx)}
+.rep{white-space:normal}.rs{padding:8px 0;border-top:1px solid var(--bd)}.rh{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ac2);margin-bottom:2px}
+.cur{display:inline-block;width:7px;height:14px;background:var(--ac);margin-left:2px;vertical-align:-2px;animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:0}}
+.meter{height:6px;background:var(--bg2);border-radius:3px;margin:6px 0 12px}.meter i{display:block;height:100%;background:var(--ac);border-radius:3px}
+@media(max-width:1000px){.ws{grid-template-columns:1fr}.chat{height:70vh}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div class="app">
+<aside id="side"><div class="logo"><i>A</i>AegisSOC</div>
+<nav id="nav"></nav><div class="side-foot"><span class="status"><span class="dot"></span>All systems operational</span></div></aside>
+<main>
+<div class="top"><button class="btn menu" id="mb">Menu</button><span class="crumb" id="crumb"></span><span class="sp"></span><input id="gs" placeholder="Search incidents…" style="min-width:200px"></div>
+<div class="banner">Simulated data. No events shown here are real security detections or real AI analysis; connect the backend API to replace them.</div>
+<div id="view"></div></main></div>
+<div class="modal" id="modal"><div class="card" id="mc"></div></div>
+<script>
+const $=s=>document.querySelector(s);
+const ICON={ov:'<path d="M3 12l9-9 9 9M5 10v10h14V10"/>',mon:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',inc:'<path d="M12 3l10 18H2zM12 10v5M12 18h.01"/>',ai:'<path d="M12 3a7 7 0 00-4 12.7V19h8v-3.3A7 7 0 0012 3zM9 22h6"/>'};
+const PAGES=[['ov','Overview'],['mon','Live Monitoring'],['inc','Incident Center'],['ai','AI Security Analyst']];
+let page='ov';
+// ---- mock data layer (swap with FastAPI calls) ----
+const API={incidents:()=>INC,events:()=>EV};
+const sevs=['Critical','High','Medium','Low'],types=['Brute Force','Port Scanning','DDoS','Malware Communication','Suspicious Traffic'];
+const ana=['A. Rao','M. Iyer','S. Khan','P. Nair'],states=['New','Investigating','Contained','Resolved'];
+const rnd=(a)=>a[Math.floor(Math.random()*a.length)],ip=()=>[rnd([185,45,103,91,194,23]),~~(Math.random()*255),~~(Math.random()*255),1+~~(Math.random()*253)].join('.');
+const titles=['SSH credential stuffing against bastion host','Horizontal port sweep on DMZ subnet','Volumetric UDP flood on API gateway','Beaconing to known C2 domain from endpoint','Anomalous outbound transfer to unknown ASN','RDP brute force from rotating proxies','Slow HTTP flood on public web tier','DNS tunnelling pattern from finance VLAN','Repeated failed MFA from foreign geolocation','Internal lateral scan from workstation'];
+let INC=titles.map((t,i)=>({id:'INC-'+(2041+i),title:t,type:types[i%5],src:ip(),dst:'10.0.'+(i%4)+'.'+(10+i*3),sev:sevs[[0,1,1,0,2,1,2,2,3,2][i]],time:new Date(Date.now()-i*3.1e6),status:states[[1,0,1,2,0,3,1,0,3,1][i]],analyst:ana[i%4],conf:70+~~(Math.random()*28)}));
+let EV=Array.from({length:10},()=>mkEv());
+function mkEv(){return{t:new Date(),src:ip(),dst:'10.0.'+~~(Math.random()*4)+'.'+(2+~~(Math.random()*200)),type:rnd(types),sev:rnd(sevs),by:rnd(['ML anomaly model','Signature rule','Threat intel match','Behavioural baseline'])}}
+const fmt=d=>d.toLocaleTimeString([],{hour12:false}),fmtD=d=>d.toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+// ---- charts ----
+function spark(vals,c){const w=100,h=28,m=Math.max(...vals),n=Math.min(...vals);const p=vals.map((v,i)=>(i/(vals.length-1)*w).toFixed(1)+','+(h-2-(v-n)/(m-n||1)*(h-4)).toFixed(1)).join(' ');return`<svg viewBox="0 0 ${w} ${h}" class="ch" style="height:28px"><polyline points="${p}" fill="none" stroke="${c}" stroke-width="1.6"/></svg>`}
+function area(series,cols,H=170){const W=600,len=series[0].length;const max=Math.max(...series.flat())*1.1;let s=`<svg viewBox="0 0 ${W} ${H}" class="ch">`;for(let g=0;g<4;g++){const y=g*H/4+4;s+=`<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="#202C3A" stroke-dasharray="2 4"/><text x="2" y="${y-2}" fill="#8795A8" font-size="9">${Math.round(max*(1-g/4))}</text>`}
+series.forEach((a,k)=>{const pts=a.map((v,i)=>[i/(len-1)*W,H-4-v/max*(H-12)]);const l=pts.map(p=>p.join(',')).join(' ');s+=`<polygon points="0,${H} ${l} ${W},${H}" fill="${cols[k]}" opacity=".12"/><polyline points="${l}" fill="none" stroke="${cols[k]}" stroke-width="2"/>`});return s+'</svg>'}
+function donut(data,cols){const tot=data.reduce((a,b)=>a+b[1],0);let a0=-Math.PI/2,s='<svg viewBox="0 0 120 120" class="ch" style="max-width:150px">';data.forEach((d,i)=>{const a1=a0+d[1]/tot*2*Math.PI,r=46,x0=60+r*Math.cos(a0),y0=60+r*Math.sin(a0),x1=60+r*Math.cos(a1),y1=60+r*Math.sin(a1);s+=`<path d="M${x0} ${y0}A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${x1} ${y1}" fill="none" stroke="${cols[i]}" stroke-width="14"/>`;a0=a1});return s+`<text x="60" y="64" text-anchor="middle" fill="#E8EEF6" font-size="16" font-weight="600">${tot}</text></svg>`}
+const series=(n,b,v)=>Array.from({length:n},()=>b+Math.random()*v);
+let tIn=series(40,40,40),tOut=series(40,20,25);
+// ---- views ----
+function kpi(l,v,t,up,vals,c){return`<div class="card kpi" style="--k:${c}"><div class="l"><span class="dot" style="background:${c}"></span> ${l}</div><div class="v">${v}</div><div class="t ${up?'up':'dn'}">${up?'▲':'▼'} ${t}% <span style="color:var(--tx2)">vs previous period</span></div>${spark(vals,c)}</div>`}
+function ovView(){const cnt=sevs.map(s=>INC.filter(i=>i.sev===s).length),tc=types.map(t=>[t,INC.filter(i=>i.type===t).length+2]);const cols=['#FF4D5E','#FFB547','#37BDF8','#39E6A3','#8795A8'];
+return`<h1>Security Operations Center</h1><div class="sub">Your infrastructure. Monitored. Analyzed. Protected.</div>
+<div class="bar"><span class="status"><span class="dot"></span>Operational</span><span class="mono" id="upd">Updated ${fmt(new Date())}</span><span style="flex:1"></span><select id="rng">${['Last 24 hours','Last 7 days','Last 30 days'].map((o,i)=>`<option value="${i}" ${i===rngI?'selected':''}>${o}</option>`).join('')}</select><button class="btn" onclick="render();toast('Dashboard refreshed')">Refresh</button><button class="btn pri" onclick="exportCsv()">Export report</button></div>
+<div class="grid kpis">${kpi('Total security events','48,213',12.4,1,series(12,3,5),'#37BDF8')}${kpi('Active threats',INC.filter(i=>i.status!=='Resolved').length,8.1,1,series(12,2,6),'#FFB547')}${kpi('Critical incidents',INC.filter(i=>i.sev==='Critical').length,3.2,1,series(12,1,4),'#FF4D5E')}${kpi('Threats blocked','12,904',5.7,0,series(12,4,5),'#39E6A3')}${kpi('Network anomalies',37,9.3,0,series(12,3,5),'#37BDF8')}${kpi('Posture score','87/100',2.1,0,series(12,6,3),'#39E6A3')}</div>
+<div class="grid two"><div class="card"><h3>Security events timeline</h3>${area([series([24,28,30][rngI],20,60),series([24,28,30][rngI],8,30),series([24,28,30][rngI],2,12)],['#37BDF8','#FFB547','#FF4D5E'])}<div class="leg"><span><i style="background:#37BDF8"></i>Total</span><span><i style="background:#FFB547"></i>High</span><span><i style="background:#FF4D5E"></i>Critical</span></div></div>
+<div class="card"><h3>Threat distribution</h3><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">${donut(tc,cols)}<div>${tc.map((d,i)=>`<div style="font-size:12.5px"><span class="dot" style="background:${cols[i]}"></span> ${d[0]} <span class="mono">${d[1]}</span></div>`).join('')}</div></div>
+<h3 style="margin-top:14px">Attack severity</h3>${sevs.map((s,i)=>`<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span class="sev s-${s}" style="width:68px;text-align:center">${s}</span><div style="flex:1;height:6px;background:var(--bg2);border-radius:3px"><div style="width:${cnt[i]/Math.max(...cnt,1)*100}%;height:100%;background:${['#FF4D5E','#FFB547','#37BDF8','#39E6A3'][i]};border-radius:3px"></div></div><span class="mono">${cnt[i]}</span></div>`).join('')}</div></div>
+<div class="grid two"><div class="card"><h3>Network traffic (simulated, Mbps)</h3><div id="traf">${trafSvg()}</div></div>
+<div class="card"><h3 style="display:flex;justify-content:space-between;align-items:center">Live threat feed <button class="btn" style="padding:2px 8px;text-transform:none;letter-spacing:0" onclick="paused=!paused;this.textContent=paused?'Resume':'Pause'">${paused?'Resume':'Pause'}</button></h3><div class="feed" id="feed">${EV.map(evRow).join('')}</div></div></div>
+<div class="grid two"><div class="card" style="grid-column:1/-1"><h3>Recent incidents</h3>${incTable(INC.slice(0,5),true)}</div>
+<div class="card"><h3>System health</h3>${['Network monitoring','ML detection engine','AI investigation engine','Threat intelligence','Database connection'].map((n,i)=>`<div class="health"><span>${n} <span class="mono">${[12,38,210,640,4][i]}ms</span></span><span class="status" style="color:${i==3?'var(--warn)':'var(--ac)'}"><span class="dot ${i==3?'warn':''}"></span>${i==3?'Degraded (mock feed)':'Healthy'}</span></div>`).join('')}</div></div>`}
+function trafSvg(){return area([tIn,tOut],['#39E6A3','#37BDF8'],150)+'<div class="mono">Green: inbound · Blue: outbound</div>'}
+function evRow(e){return`<div class="ev"><span class="mono">${fmt(e.t)}</span><span><b>${e.type}</b> <span class="mono">${e.src} → ${e.dst}</span><br><span class="mono">${e.by}</span></span><span class="sev s-${e.sev}">${e.sev}</span></div>`}
+let sort={k:'time',d:-1},fsev='All',q='';
+function incTable(list,mini){return`<div class="tw"><table><thead><tr>${[['id','ID'],['title','Title'],['type','Type'],['src','Source IP'],['sev','Severity'],['time','Detected'],['status','Status'],['analyst','Analyst']].map(c=>`<th ${mini?'':`onclick="setSort('${c[0]}')"`}>${c[1]}${!mini&&sort.k===c[0]?(sort.d>0?' ↑':' ↓'):''}</th>`).join('')}<th></th></tr></thead><tbody>${list.map(i=>`<tr class="r" onclick="openInc('${i.id}')"><td class="mono">${i.id}</td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis">${i.title}</td><td>${i.type}</td><td class="mono">${i.src}</td><td><span class="sev s-${i.sev}">${i.sev}</span></td><td class="mono">${fmtD(i.time)}</td><td>${i.status}</td><td>${i.analyst}</td><td><button class="btn" style="padding:3px 9px">View</button></td></tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--tx2);padding:28px">No incidents match your filters.</td></tr>'}</tbody></table></div>`}
+function setSort(k){sort=sort.k===k?{k,d:-sort.d}:{k,d:1};render()}
+function incView(){let l=INC.filter(i=>(fsev==='All'||i.sev===fsev)&&(i.title+i.id+i.type+i.src).toLowerCase().includes(q.toLowerCase()));l=[...l].sort((a,b)=>(sv(a)>sv(b)?1:-1)*sort.d);
+return`<h1>Incident Center</h1><div class="sub">Workflow: New → Investigating → Contained → Resolved</div>
+<div class="grid kpis">${states.map(s=>`<div class="card kpi"><div class="l">${s}</div><div class="v">${INC.filter(i=>i.status===s).length}</div></div>`).join('')}</div>
+<div class="card"><div class="bar"><input id="iq" placeholder="Filter by ID, title, type, IP…" value="${q}" style="flex:1;min-width:200px"><select id="fs">${['All',...sevs].map(s=>`<option ${s===fsev?'selected':''}>${s}</option>`).join('')}</select></div>${incTable(l)}</div>`}
+function monView(){return`<h1>Live Monitoring</h1><div class="sub">Simulated traffic and event stream</div>
+<div class="grid two"><div class="card"><h3>Throughput (Mbps)</h3><div id="traf">${trafSvg()}</div></div><div class="card"><h3>Network map</h3><svg viewBox="0 0 300 200" class="ch" id="net"></svg></div></div>
+<div class="card"><h3>Event stream</h3><div class="feed" id="feed">${EV.map(evRow).join('')}</div></div>`}
+function netDraw(){const el=$('#net');if(!el)return;const t=Date.now()/1000;const nodes=Array.from({length:8},(_,i)=>{const a=i/8*6.283+t*.15;return{x:150+Math.cos(a)*85,y:100+Math.sin(a)*65,bad:i===2||i===5}});el.innerHTML=nodes.map((n,i)=>`<line x1="150" y1="100" x2="${n.x}" y2="${n.y}" stroke="${n.bad?'#FF4D5E':'#202C3A'}" stroke-dasharray="${n.bad?'3 3':''}"/>`).join('')+nodes.map(n=>`<circle cx="${n.x}" cy="${n.y}" r="7" fill="#111925" stroke="${n.bad?'#FF4D5E':'#37BDF8'}" stroke-width="1.6"/>`).join('')+`<circle cx="150" cy="100" r="13" fill="#0D121C" stroke="#39E6A3" stroke-width="2"/><text x="150" y="104" text-anchor="middle" fill="#39E6A3" font-size="9">SOC</text>`}
+// ---- incident modal ----
+function openInc(id){const i=INC.find(x=>x.id===id);const rec={'Brute Force':'Enforce account lockout, require MFA, block source range at the perimeter.','Port Scanning':'Rate-limit scanning sources, review exposed services, add IDS rule.','DDoS':'Engage upstream scrubbing, enable rate limiting on the gateway.','Malware Communication':'Isolate host, block C2 domain, collect memory image.','Suspicious Traffic':'Inspect flow records, validate destination ASN, apply egress filtering.'}[i.type];
+$('#mc').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:start"><div><span class="mono">${i.id}</span><h1 style="font-size:18px">${i.title}</h1></div><button class="btn" onclick="closeM()">Close</button></div><span class="sev s-${i.sev}">${i.sev}</span>
+<div class="flow">${states.map(s=>`<button class="${s===i.status?'on':''}" onclick="setSt('${i.id}','${s}')">${s}</button>`).join('')}</div>
+<div class="kv"><span>Attack type</span><span>${i.type}</span><span>Source</span><span class="mono">${i.src}</span><span>Destination</span><span class="mono">${i.dst}</span><span>Detected</span><span>${fmtD(i.time)}</span><span>Analyst</span><span>${i.analyst}</span><span>Confidence</span><span>${i.conf}% (simulated)</span></div>
+<h3>AI-generated analysis (simulated)</h3><p>Pattern is consistent with ${i.type.toLowerCase()} activity originating from ${i.src}. Correlated with ${2+i.conf%5} related flows in the last hour.</p><h3>Recommended actions</h3><p>${rec}</p>`;$('#modal').classList.add('show')}
+function closeM(){$('#modal').classList.remove('show')}
+function setSt(id,s){INC.find(x=>x.id===id).status=s;toast(id+' moved to '+s);openInc(id);render()}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+function exportCsv(){const c='id,title,type,severity,status\n'+INC.map(i=>[i.id,'"'+i.title+'"',i.type,i.sev,i.status].join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='aegissoc-incidents.csv';a.click();toast('Report exported')}
+// ---- AI analyst (simulated) ----
+const PROMPTS=['Investigate the latest critical threat','Summarize today’s security incidents','Analyze a brute-force attack','Recommend defensive actions'];
+let chat=[];
+function aiReply(p){const c=INC.find(i=>i.sev==='Critical')||INC[0];return`Threat summary\n${c.id}: ${c.title}.\n\nSeverity assessment\n${c.sev}, confidence ${c.conf}%.\n\nEvidence\n• Source ${c.src} → ${c.dst}\n• Detected by behavioural baseline and signature match\n\nPossible technique\n${c.type} (maps to MITRE ATT&CK TA0006/TA0043 family).\n\nPotential impact\nCredential compromise or service degradation if unmitigated.\n\nRecommended actions\n1. Block source at the perimeter\n2. Force credential reset on targeted accounts\n3. Increase logging on the affected segment`}
+function aiView(){return`<h1>AI Security Analyst</h1><div class="sub">Hello, Security Analyst. Ask about threats, incidents and anomalies.</div><div class="card chat"><div class="msgs" id="msgs">${chat.length?chat.map(mHtml).join(''):`<div style="color:var(--tx2)">Your AI-powered investigation assistant is ready.</div><div class="chips">${PROMPTS.map(p=>`<button class="chip" onclick="send(this.textContent)">${p}</button>`).join('')}</div>`}</div><div class="inp"><textarea id="ai" placeholder="Ask the analyst… (Enter to send, Shift+Enter for new line)"></textarea><button class="btn pri" onclick="send()">Send</button><button class="btn" onclick="chat=[];render()">Clear</button></div></div>`}
+function mHtml(m){const e=m.t.replace(/</g,'&lt;');return`<div class="m ${m.r}">${m.r==='a'?'<span class="tag">Simulated response, not real backend analysis</span>':''}${e}${m.r==='a'?`<br><button class="btn" style="margin-top:8px;padding:3px 9px" onclick="navigator.clipboard&&navigator.clipboard.writeText(chat[${chat.indexOf(m)}].t);toast('Copied')">Copy</button>`:''}</div>`}
+function send(t){const el=$('#ai');t=(t||el.value).trim();if(!t)return;chat.push({r:'u',t});render();chat.push({r:'a',t:'…'});const idx=chat.length-1;render();setTimeout(()=>{chat[idx].t=aiReply(t);render()},900)}
+let rngI=0,paused=false,hist=[],busy=false,cur=null;
+const sv=x=>sort.k==='sev'?sevs.indexOf(x.sev):x[sort.k];
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function report(p){const l=p.toLowerCase();const c=INC.find(i=>l.includes('brute')?i.type==='Brute Force':l.includes('port')?i.type==='Port Scanning':l.includes('ddos')?i.type==='DDoS':i.sev==='Critical')||INC[0];
+if(l.includes('summar')){const o=INC.filter(i=>i.status!=='Resolved').length;return{inc:c,sev:c.sev,sec:[['Threat summary',`${INC.length} incidents tracked, ${o} still open, ${INC.filter(i=>i.sev==='Critical').length} critical.`],['Severity assessment','Overall posture elevated by critical credential and C2 activity.'],['Evidence','Most active vectors: '+types.slice(0,3).join(', ')+'.'],['Possible attack technique','Multi-vector campaign mixing discovery and credential access.'],['Potential impact','Account takeover and data exposure if open items stay uncontained.'],['Recommended defensive actions','Prioritise critical incidents, confirm containment on open items, review analyst load.']]}}
+return{inc:c,sev:c.sev,sec:[['Threat summary',`${c.id}: ${c.title}.`],['Severity assessment',`${c.sev} with ${c.conf}% model confidence.`],['Evidence',`Source ${c.src} to ${c.dst}; flagged by behavioural baseline and signature match.`],['Possible attack technique',`${c.type}, consistent with MITRE ATT&CK credential access or discovery tactics.`],['Potential impact','Credential compromise or service degradation if left unmitigated.'],['Recommended defensive actions','Block the source at the perimeter, force credential resets on targeted accounts, raise logging on the affected segment.']]}}
+const plain=r=>r.sec.map((s,k)=>`${k+1}. ${s[0]}\n${s[1]}`).join('\n\n');
+function mHtml(m,i){if(m.r==='u')return`<div class="m u">${esc(m.t)}</div>`;const tag='<span class="tag">Simulated response, not real backend analysis</span>';
+if(!m.done)return`<div class="m a">${tag}<span id="stream">${esc(m.t)}</span><span class="cur"></span></div>`;
+return`<div class="m a rep">${tag}<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><b>Investigation report</b><span class="sev s-${m.rep.sev}">${m.rep.sev}</span></div>${m.rep.sec.map((s,k)=>`<div class="rs"><div class="rh">${k+1}. ${s[0]}</div>${esc(s[1])}</div>`).join('')}<button class="btn" style="margin-top:8px;padding:3px 9px" onclick="cp(${i})">Copy report</button></div>`}
+function cp(i){const t=plain(chat[i].rep);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Report copied'),()=>toast('Copy is not available in this browser'))}
+function send(t){if(busy)return;const el=$('#ai');t=(t||(el?el.value:'')).trim();if(!t)return;busy=true;const rep=report(t);cur=rep.inc;chat.push({r:'u',t});const m={r:'a',t:'',done:false,rep};chat.push(m);render();const full=plain(rep);let n=0;const iv=setInterval(()=>{n+=4;m.t=full.slice(0,n);const s=$('#stream');if(s)s.textContent=m.t;const ms=$('#msgs');if(ms)ms.scrollTop=ms.scrollHeight;if(n>=full.length){clearInterval(iv);m.done=true;busy=false;render()}},18)}
+function newInv(){if(chat.length&&!hist.some(h=>h.chat===chat))hist.unshift({t:(chat.find(m=>m.r==='u')||{t:'Investigation'}).t,chat,cur});chat=[];cur=null;busy=false;render()}
+function loadInv(i){chat=hist[i].chat;cur=hist[i].cur;render()}
+function aiView(){const c=cur,P=['Investigate the latest critical threat','Explain suspicious network traffic','Analyze a brute-force attack','Summarize today’s security incidents','Recommend defensive actions','Identify possible attack patterns'];
+return`<h1>AI Security Analyst</h1><div class="sub">Hello, Security Analyst. Your AI-powered investigation assistant is ready.</div><div class="ws"><div class="card"><button class="btn pri" style="width:100%" onclick="newInv()">New investigation</button><h3 style="margin-top:14px">Investigations</h3>${hist.map((h,i)=>`<div class="hi" onclick="loadInv(${i})" title="${esc(h.t)}">${esc(h.t)}</div>`).join('')||'<div style="color:var(--tx2);font-size:12.5px">No previous investigations yet.</div>'}</div>
+<div class="card chat"><div class="msgs" id="msgs">${chat.length?chat.map(mHtml).join(''):`<div style="color:var(--tx2)">Ask about threats, incidents, network anomalies and security events.</div><div class="chips">${P.map(p=>`<button class="chip" onclick="send(this.textContent)">${p}</button>`).join('')}</div>`}</div><div class="inp"><textarea id="ai" placeholder="Ask the analyst… (Enter to send, Shift+Enter for new line)"></textarea><button class="btn pri" onclick="send()">Send</button><button class="btn" onclick="chat=[];cur=null;busy=false;render()">Clear</button></div></div>
+<div class="card"><h3>Evidence</h3>${c?`<span class="sev s-${c.sev}">${c.sev}</span><div class="kv"><span>Incident</span><span class="mono">${c.id}</span><span>Source</span><span class="mono">${c.src}</span><span>Target</span><span class="mono">${c.dst}</span><span>Technique</span><span>${c.type}</span><span>Status</span><span>${c.status}</span></div><div class="mono">Model confidence ${c.conf}%</div><div class="meter"><i style="width:${c.conf}%"></i></div><button class="btn" onclick="openInc('${c.id}')">Open incident</button>`:'<div style="color:var(--tx2);font-size:12.5px">Evidence for the current investigation appears here.</div>'}</div></div>`}
+// ---- shell ----
+function render(){const v=$('#view');$('#crumb').textContent='AegisSOC / '+PAGES.find(p=>p[0]===page)[1];
+$('#nav').innerHTML=PAGES.map(p=>`<button class="${p[0]===page?'on':''}" onclick="go('${p[0]}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[p[0]]}</svg>${p[1]}</button>`).join('');
+v.innerHTML={ov:ovView,mon:monView,inc:incView,ai:aiView}[page]();
+const iq=$('#iq');if(iq){iq.oninput=e=>{q=e.target.value;const p=e.target.selectionStart;render();const n=$('#iq');n.focus();n.setSelectionRange(p,p)}}
+const rg=$('#rng');if(rg)rg.onchange=e=>{rngI=+e.target.value;render();toast('Range updated')};const fs=$('#fs');if(fs)fs.onchange=e=>{fsev=e.target.value;render()};
+const ai=$('#ai');if(ai)ai.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}};
+const ms=$('#msgs');if(ms)ms.scrollTop=ms.scrollHeight;netDraw()}
+function go(p){page=p;$('#side').classList.remove('open');render()}
+$('#mb').onclick=()=>$('#side').classList.toggle('open');
+$('#modal').onclick=e=>{if(e.target.id==='modal')closeM()};
+$('#gs').oninput=e=>{q=e.target.value;if(page!=='inc')page='inc';render()};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();$('#gs').focus()}if(e.key==='Escape')closeM()});
+setInterval(()=>{tIn.push(40+Math.random()*50);tIn.shift();tOut.push(20+Math.random()*30);tOut.shift();const t=$('#traf');if(t)t.innerHTML=trafSvg();netDraw()},1500);
+setInterval(()=>{if(paused)return;EV.unshift(mkEv());EV=EV.slice(0,25);const f=$('#feed');if(f)f.innerHTML=EV.map(evRow).join('')},3500);
+render();
+</script></body></html>
