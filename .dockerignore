@@ -1,0 +1,50 @@
+# =============================================================================
+# AegisSOC Docker Build Ignore File
+# Excludes local environments, caches, secrets, and test artifacts
+# =============================================================================
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python byte code and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+
+# Testing and coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+tests/
+*.log
+
+# Environment variables & secrets (NEVER BUNDLE IN IMAGES)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+aegissoc.db
+
+# Documentation and temporary files
+*.tmp
+*.md
+!requirements.txt
+
+# Frontend (Frontend is decoupled or hosted on CDN/Nginx)
+frontend/
+node_modules/

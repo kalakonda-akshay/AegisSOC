@@ -1,0 +1,33 @@
+# =============================================================================
+# AegisSOC Render Blueprint Configuration (100% Free Tier)
+# =============================================================================
+# Connect this repository to https://render.com via "New Blueprint Instance"
+# to automatically deploy the complete AegisSOC platform with zero manual steps.
+
+services:
+  - type: web
+    name: aegissoc
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./aegissoc.db
+      - key: CORS_ORIGINS
+        value: '["*"]'
+      - key: DEFAULT_AI_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: VIRUSTOTAL_API_KEY
+        sync: false
+      - key: ABUSEIPDB_API_KEY
+        sync: false
